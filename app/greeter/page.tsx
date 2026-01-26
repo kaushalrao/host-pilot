@@ -101,12 +101,12 @@ export default function GreeterPage() {
 
     return (
         <div className="animate-fade-in pb-10 flex flex-col gap-6 md:gap-10 h-full relative">
-            <div className="hidden lg:block">
+            <div className="hidden lg:block mt-8">
                 <PropertyDock properties={properties} selectedId={selectedPropId} onSelect={setSelectedPropId} />
             </div>
 
             {/* Mobile Header Controls (moved from Header component) */}
-            <div className="lg:hidden w-full pb-3 sticky top-[72px] z-40 bg-[#0f172a]/95 backdrop-blur-xl -mt-4 pt-4">
+            <div className="lg:hidden w-[calc(100%+2rem)] -mx-4 pb-3 sticky top-[72px] z-40 bg-[#0f172a]/95 backdrop-blur-xl -mt-4 pt-4 px-4 border-b border-white/5">
                 <div className="flex justify-center mb-4">
                     <TabControl
                         options={[{ id: 'edit', label: 'Editor', icon: <PenTool size={12} /> }, { id: 'preview', label: 'Preview', icon: <Eye size={12} /> }]}
@@ -119,18 +119,27 @@ export default function GreeterPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className={`lg:col-span-7 space-y-6 md:space-y-8 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
-                    <GuestForm
-                        details={guestDetails}
-                        onChange={setGuestDetails}
-                        templateContent={selectedTemplate?.content}
-                    />
-                    {templates.length > 0 && (
-                        <TemplateSelector templates={templates} selectedId={selectedTempId} onSelect={setSelectedTempId} />
-                    )}
+                {/* Left Section: Form and Templates */}
+                <div className={`lg:col-span-8 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
+                        <div className="space-y-6 md:space-y-8">
+                            <GuestForm
+                                details={guestDetails}
+                                onChange={setGuestDetails}
+                                templateContent={selectedTemplate?.content}
+                            />
+                        </div>
+
+                        <div className="sticky top-24">
+                            {templates.length > 0 && (
+                                <TemplateSelector templates={templates} selectedId={selectedTempId} onSelect={setSelectedTempId} />
+                            )}
+                        </div>
+                    </div>
                 </div>
 
-                <div className={`lg:col-span-5 lg:sticky lg:top-24 ${mobileTab === 'edit' ? 'hidden lg:block' : 'block'}`}>
+                {/* Right Section: Preview Phone */}
+                <div className={`lg:col-span-4 lg:sticky lg:top-24 ${mobileTab === 'edit' ? 'hidden lg:block' : 'block'}`}>
                     <PreviewPhone message={generatedMessage} onSend={handleWhatsApp} onCopy={handleCopy} copied={copied} />
                 </div>
             </div>

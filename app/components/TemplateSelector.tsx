@@ -20,11 +20,11 @@ export const TemplateSelector: React.FC<{
                         key={t.id}
                         onClick={() => onSelect(t.id)}
                         className={`group relative p-2 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all duration-300 aspect-square border ${isSelected
-                                ? 'bg-gradient-to-br from-orange-600/20 to-pink-600/20 border-orange-500/50 shadow-lg shadow-orange-900/20'
-                                : 'bg-slate-800/40 border-white/5 hover:bg-slate-800 hover:border-white/10'
+                            ? 'bg-gradient-to-br from-indigo-600/20 to-purple-600/20 border-indigo-500/50 shadow-lg shadow-indigo-900/20'
+                            : 'bg-slate-800/40 border-white/5 hover:bg-slate-800 hover:border-white/10'
                             }`}
                     >
-                        <div className={`p-2 rounded-xl transition-all duration-300 ${isSelected ? 'bg-gradient-to-br from-orange-500 to-pink-600 text-white shadow-lg' : 'bg-black/20 text-slate-400 group-hover:text-white group-hover:bg-black/40'}`}>
+                        <div className={`p-2 rounded-xl transition-all duration-300 ${isSelected ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg' : 'bg-black/20 text-slate-400 group-hover:text-white group-hover:bg-black/40'}`}>
                             <Icon className="w-4 h-4 md:w-6 md:h-6" />
                         </div>
                         <span className={`text-[10px] font-bold tracking-wide transition-colors truncate w-full text-center ${isSelected ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}`}>

@@ -24,11 +24,11 @@ export const PreviewPhone: React.FC<{
             </button>
         </div>
 
-        <div className="relative bg-[#0b141a] min-h-[400px] lg:min-h-[500px] p-4 bg-[url('https://i.pinimg.com/originals/97/c0/07/97c00759d90d786d9b6096d274ad3e07.png')] bg-opacity-10 bg-contain">
-            <div className="bg-[#202c33] p-4 rounded-tr-2xl rounded-bl-2xl rounded-br-2xl text-slate-100 text-[15px] leading-relaxed shadow-sm max-w-[95%] relative border border-white/5 animate-fade-in">
-                <div className="whitespace-pre-wrap text-sm md:text-[15px]">{message}</div>
-                <div className="text-[10px] text-slate-500 text-right mt-2 flex items-center justify-end gap-1">
-                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <Check size={14} className="text-blue-400" />
+        <div className="relative bg-[#0b141a] min-h-[350px] lg:min-h-[400px] p-3 bg-[url('https://i.pinimg.com/originals/97/c0/07/97c00759d90d786d9b6096d274ad3e07.png')] bg-opacity-10 bg-contain">
+            <div className="bg-[#202c33] p-3 rounded-tr-xl rounded-bl-xl rounded-br-xl text-slate-100 text-xs leading-relaxed shadow-sm max-w-[95%] relative border border-white/5 animate-fade-in">
+                <div className="whitespace-pre-wrap break-words">{message}</div>
+                <div className="text-[9px] text-slate-500 text-right mt-1.5 flex items-center justify-end gap-1">
+                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <Check size={12} className="text-blue-400" />
                 </div>
             </div>
         </div>

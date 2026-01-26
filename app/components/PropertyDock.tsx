@@ -13,8 +13,8 @@ export const PropertyDock: React.FC<{
                     key={p.id}
                     onClick={() => onSelect(p.id)}
                     className={`flex-shrink-0 whitespace-nowrap px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border ${selectedId === p.id
-                            ? 'bg-gradient-to-r from-orange-500 to-pink-600 text-white shadow-lg shadow-orange-500/30 border-transparent'
-                            : 'bg-transparent text-slate-400 border-white/5 hover:text-white hover:bg-white/5'
+                        ? 'bg-gradient-to-r from-orange-500 to-pink-600 text-white shadow-lg shadow-orange-500/30 border-transparent'
+                        : 'bg-transparent text-slate-400 border-white/5 hover:text-white hover:bg-white/5'
                         }`}
                 >
                     {p.name}

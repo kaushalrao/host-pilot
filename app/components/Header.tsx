@@ -18,7 +18,7 @@ export const Header: React.FC = () => {
     if (isAuth) return null;
 
     return (
-        <div className={`sticky top-0 z-50 flex flex-col transition-all duration-300 ${isHome ? 'bg-transparent' : 'bg-[#0f172a]/95 backdrop-blur-xl border-b border-white/5'}`}>
+        <div className={`sticky top-0 z-50 flex flex-col transition-all duration-300 border-b ${isHome ? 'bg-transparent border-transparent' : 'bg-[#0f172a]/95 backdrop-blur-xl border-white/5'}`}>
             <div className="px-4 lg:px-8 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-4 max-w-7xl mx-auto w-full">
                     <div className="flex items-center gap-3 w-full">
