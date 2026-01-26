@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from 'react';
+import React from 'react';
 import { Loader2, Sparkles, Hand, Settings, Wrench } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -39,7 +39,7 @@ export default function HomePage() {
 
         <h1 className="text-3xl md:text-6xl font-black text-white tracking-tighter drop-shadow-sm flex flex-col gap-2 md:gap-4">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-400 h-[1.3em] pb-2">
-            <TypewriterEffect words={["Generate Welcome Messages", "Track Maintenance", "Simplify Hospitality"]} />
+            <TypewriterEffect words={["Simplify Hospitality", "Guest Greeting", "Track Maintenance"]} />
           </span>
         </h1>
 

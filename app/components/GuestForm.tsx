@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Users, Edit3, Calendar, CalendarCheck, Wallet } from 'lucide-react';
 import { Card } from './ui/Card';
 import { SectionHeader } from './ui/SectionHeader';

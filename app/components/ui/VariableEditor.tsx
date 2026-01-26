@@ -1,9 +1,5 @@
-import * as React from 'react';
-import { useRef, useImperativeHandle } from 'react';
-
-export interface VariableEditorRef {
-    insert: (text: string) => void;
-}
+import React, { useRef, useImperativeHandle } from 'react';
+import { VariableEditorRef } from '../../lib/types';
 
 export const VariableEditor = React.forwardRef<VariableEditorRef, {
     value: string;

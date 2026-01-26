@@ -1,7 +1,6 @@
 "use client";
 
-import * as React from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import { auth, db, appId } from '../../lib/firebase';

@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, User } from "firebase/auth";
 import { Sparkles, UserCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { app, auth } from '../lib/firebase';

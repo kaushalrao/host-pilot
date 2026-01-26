@@ -2,7 +2,7 @@ import {
     CalendarCheck, MapPin, Coffee, Wifi,
     Utensils, MessageCircle, LogOut, Home, FileText
 } from 'lucide-react';
-import * as React from 'react';
+import React from 'react';
 
 export const AVAILABLE_ICONS: Record<string, React.ElementType> = {
     CalendarCheck, MapPin, Coffee, Wifi, Utensils, LogOut, MessageCircle, Home, FileText

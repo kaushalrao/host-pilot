@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '../components/providers/AppProvider';
 import { AuthForm } from '../components/AuthForm';

@@ -1,7 +1,6 @@
 "use client";
 
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../components/providers/AppProvider';
 import { useRouter } from 'next/navigation';
 import { Wrench, Plus, CheckCircle2, Circle, AlertTriangle, Trash2, Filter, Home, ChevronDown } from 'lucide-react';

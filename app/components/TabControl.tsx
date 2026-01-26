@@ -1,11 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 
-export const TabControl: React.FC<{
-    options: { id: string; label: string; icon?: React.ReactNode }[];
-    activeId: string;
-    onChange: (id: any) => void;
-    className?: string;
-}> = ({ options, activeId, onChange, className = '' }) => (
+import { TabControlProps } from '../lib/types';
+
+export const TabControl: React.FC<TabControlProps> = ({ options, activeId, onChange, className = '' }) => (
     <div className={`bg-slate-900/90 p-1 rounded-2xl inline-flex border border-white/10 relative shadow-2xl ${className}`}>
         {options.map(opt => (
             <button

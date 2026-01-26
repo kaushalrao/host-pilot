@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Smartphone, Check, Copy, MessageCircle } from 'lucide-react';
 import { Button } from './ui/Button';
 

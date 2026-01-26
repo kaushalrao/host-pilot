@@ -48,3 +48,12 @@ export interface MaintenanceIssue {
     dueDate?: string;
     createdAt: number;
 }
+export interface VariableEditorRef {
+    insert: (text: string) => void;
+}
+export interface TabControlProps {
+    options: { id: string; label: string; icon?: React.ReactNode }[];
+    activeId: string;
+    onChange: (id: any) => void;
+    className?: string;
+}

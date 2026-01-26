@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { VARIABLE_CATEGORIES } from '../lib/utils';
 
 export const VariableList: React.FC<{ onInsert: (tag: string) => void }> = ({ onInsert }) => (

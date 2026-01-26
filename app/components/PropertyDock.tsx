@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Property } from '../lib/types';
 
 export const PropertyDock: React.FC<{
