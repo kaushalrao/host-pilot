@@ -12,6 +12,21 @@ export interface FeatureCardProps {
     iconHoverRotation?: string;
 }
 
+export interface IcalFeed {
+    id: string;
+    name: string;
+    url: string;
+    color: string;
+}
+
+export interface CalendarEvent {
+    start: string;
+    end: string;
+    summary?: string;
+    source?: string; // 'airbnb' | 'manual' | 'booking.com' etc
+    color?: string;
+}
+
 export interface Property {
     id: string;
     name: string;
@@ -25,7 +40,8 @@ export interface Property {
     wifiPass: string;
     locationLink: string;
     propertyLink: string;
-    airbnbIcalUrl?: string;
+    icalFeeds: IcalFeed[];
+    airbnbIcalUrl?: string; // Deprecated, kept for migration
     basePrice: number;
     extraGuestPrice: number;
     baseGuests: number;
@@ -117,7 +133,8 @@ export interface GuestFormProps {
     details: GuestDetails;
     onChange: (details: GuestDetails) => void;
     templateContent?: string;
-    blockedDates?: { start: string, end: string }[];
+    blockedDates?: CalendarEvent[];
     onSaveGuest?: () => void;
     onOpenDirectory?: () => void;
+    icalFeeds?: IcalFeed[];
 }

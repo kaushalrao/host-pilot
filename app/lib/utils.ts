@@ -41,22 +41,21 @@ export const processTemplate = (templateStr: string, data: Record<string, string
     });
 };
 
-export const isDateBlocked = (dateStr: string, blockedDates: { start: string, end: string }[], variant: 'check-in' | 'check-out' = 'check-in'): boolean => {
-    // Check-out Blocked: check-out > start AND check-out <= end
-    if (variant === 'check-out') {
-        return blockedDates.some(range => dateStr > range.start && dateStr <= range.end);
-    }
-    // Check-in (default)
-    // Blocked if: day >= start && day < end
-    return blockedDates.some(range => dateStr >= range.start && dateStr < range.end);
-};
 
-export const isTurnoverDate = (dateStr: string, blockedDates: { start: string, end: string }[], variant: 'check-in' | 'check-out' = 'check-in'): boolean => {
-    return blockedDates.some(range => {
-        if (variant === 'check-in') return dateStr === range.end;
-        if (variant === 'check-out') return dateStr === range.start;
-        return false;
-    });
+
+export const fetchExternalCalendar = async (url: string): Promise<{ start: string, end: string, summary: string }[]> => {
+    try {
+        const res = await fetch(`/api/calendar?url=${encodeURIComponent(url)}`);
+        if (res.ok) {
+            const data = await res.json();
+            if (data.events) {
+                return data.events;
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching calendar:", url, error);
+    }
+    return [];
 };
 
 export const getStatusColor = (status: Guest['status']) => {

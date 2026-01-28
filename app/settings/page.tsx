@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Home, Edit3, Trash2, Plus, LogOut, Users, CreditCard, Clock, Wifi, MessageCircle, Sparkles, X, Copy, Check } from 'lucide-react';
+import { Home, Edit3, Trash2, Plus, LogOut, Users, CreditCard, Clock, Wifi, MessageCircle, Sparkles, X, Copy, Check, Calendar as CalendarIcon } from 'lucide-react';
 import { collection, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { Property, Template } from '../lib/types';
 import { DEFAULT_PROPERTY_TIMES, DEFAULT_PROPERTY_VALUES } from '../lib/constants';
@@ -93,6 +93,7 @@ export default function SettingsPage() {
             basePrice: Number(formData.get('basePrice')) || DEFAULT_PROPERTY_VALUES.basePrice,
             extraGuestPrice: Number(formData.get('extraGuestPrice')) || DEFAULT_PROPERTY_VALUES.extraGuestPrice,
             baseGuests: Number(formData.get('baseGuests')) || DEFAULT_PROPERTY_VALUES.baseGuests,
+            icalFeeds: editingProp.icalFeeds || [],
         };
 
         const success = await saveToFirestore('properties', newProp, editingProp.id);
@@ -244,7 +245,84 @@ export default function SettingsPage() {
                                         <Input name="wifiPass" label="WiFi Password" defaultValue={editingProp.wifiPass} />
                                         <Input name="locationLink" label="Maps Link" defaultValue={editingProp.locationLink} placeholder="https://maps..." />
                                         <Input name="propertyLink" label="Website Link" defaultValue={editingProp.propertyLink} placeholder="https://website..." />
-                                        <Input name="airbnbIcalUrl" label="Airbnb iCal URL (Import)" defaultValue={editingProp.airbnbIcalUrl} placeholder="https://www.airbnb.com/calendar/ical/..." />
+
+                                        <div className="space-y-3 pt-2">
+                                            <div className="flex items-center justify-between">
+                                                <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                                                    <CalendarIcon size={14} /> External Calendars
+                                                </h4>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newFeed = { id: Date.now().toString(), name: '', url: '', color: '#3b82f6' };
+                                                        setEditingProp(prev => prev ? ({ ...prev, icalFeeds: [...(prev.icalFeeds || []), newFeed] }) : null);
+                                                    }}
+                                                    className="text-[10px] font-bold bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded-lg hover:bg-indigo-500/20 transition-all flex items-center gap-1"
+                                                >
+                                                    <Plus size={12} /> Add Calendar
+                                                </button>
+                                            </div>
+
+                                            {(!editingProp.icalFeeds || editingProp.icalFeeds.length === 0) && !editingProp.airbnbIcalUrl && (
+                                                <div className="text-sm text-slate-500 italic px-4 py-2 border border-white/5 bg-white/5 rounded-xl text-center">
+                                                    No external calendars linked.
+                                                </div>
+                                            )}
+
+                                            {editingProp.icalFeeds?.map((feed, index) => (
+                                                <div key={feed.id} className="flex gap-2 items-start bg-slate-900/50 p-3 rounded-xl border border-white/10 group animate-fade-in relative">
+                                                    <div className="w-1 self-stretch rounded-full" style={{ backgroundColor: feed.color }}></div>
+                                                    <div className="flex-1 space-y-2">
+                                                        <input
+                                                            value={feed.name}
+                                                            onChange={(e) => {
+                                                                const newFeeds = [...(editingProp.icalFeeds || [])];
+                                                                newFeeds[index] = { ...newFeeds[index], name: e.target.value };
+                                                                setEditingProp(prev => prev ? ({ ...prev, icalFeeds: newFeeds }) : null);
+                                                            }}
+                                                            placeholder="Calendar Name (e.g. Booking.com)"
+                                                            className="w-full bg-transparent text-sm font-bold text-white placeholder:text-slate-600 focus:outline-none"
+                                                        />
+                                                        <input
+                                                            value={feed.url}
+                                                            onChange={(e) => {
+                                                                const newFeeds = [...(editingProp.icalFeeds || [])];
+                                                                newFeeds[index] = { ...newFeeds[index], url: e.target.value };
+                                                                setEditingProp(prev => prev ? ({ ...prev, icalFeeds: newFeeds }) : null);
+                                                            }}
+                                                            placeholder="https://..."
+                                                            className="w-full bg-transparent text-xs text-slate-400 focus:text-white placeholder:text-slate-700 focus:outline-none font-mono"
+                                                        />
+                                                        {/* Color Picker (Simple Presets) */}
+                                                        <div className="flex gap-1.5 pt-1">
+                                                            {['#FF5A5F', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'].map(c => (
+                                                                <button
+                                                                    key={c}
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        const newFeeds = [...(editingProp.icalFeeds || [])];
+                                                                        newFeeds[index] = { ...newFeeds[index], color: c };
+                                                                        setEditingProp(prev => prev ? ({ ...prev, icalFeeds: newFeeds }) : null);
+                                                                    }}
+                                                                    className={`w-4 h-4 rounded-full transition-all ${feed.color === c ? 'ring-2 ring-white scale-110' : 'opacity-50 hover:opacity-100 hover:scale-110'}`}
+                                                                    style={{ backgroundColor: c }}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newFeeds = editingProp.icalFeeds?.filter((_, i) => i !== index);
+                                                            setEditingProp(prev => prev ? ({ ...prev, icalFeeds: newFeeds }) : null);
+                                                        }}
+                                                        className="p-1.5 text-slate-600 hover:text-white hover:bg-white/10 rounded-lg transition-colors absolute top-2 right-2"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
 
                                         {editingProp.id && (
                                             <div className="space-y-1">

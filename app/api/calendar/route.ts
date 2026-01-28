@@ -12,6 +12,7 @@ export async function GET(request: Request) {
 
     try {
         const response = await fetch(url, {
+            next: { revalidate: 3600 },
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
@@ -42,16 +43,17 @@ export async function GET(request: Request) {
                 // Format: YYYYMMDD -> YYYY-MM-DD
                 const formatDate = (d: string) => `${d.substring(0, 4)}-${d.substring(4, 6)}-${d.substring(6, 8)}`;
 
-                events.push({
-                    start: formatDate(s),
-                    end: formatDate(e),
-                    summary: summaryMatch ? summaryMatch[1].trim() : 'Booked'
-                });
+                const start = formatDate(s);
+                const end = formatDate(e);
+                const summary = summaryMatch ? summaryMatch[1].trim() : 'Booked';
+
+                events.push({ start, end, summary });
             }
         }
 
         return NextResponse.json({ events });
     } catch (error: any) {
+        console.error('Calendar Fetch Error:', error);
         return NextResponse.json({ error: error.message || 'Failed to fetch calendar', details: error.toString() }, { status: 500 });
     }
 }

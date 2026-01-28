@@ -2,9 +2,9 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Check, Copy, MessageCircle, PenTool, Eye, X, Loader2 } from 'lucide-react';
-import { GuestDetails, Guest } from '../lib/types';
+import { GuestDetails, Guest, CalendarEvent } from '../lib/types';
 import { DEFAULT_GUEST_DETAILS } from '../lib/constants';
-import { calculateNights, formatDate, formatCurrency, processTemplate } from '../lib/utils';
+import { calculateNights, formatDate, formatCurrency, processTemplate, fetchExternalCalendar } from '../lib/utils';
 import { PropertyDock } from '../components/PropertyDock';
 import { Portal } from '../components/ui/Portal';
 import { GuestForm } from '../components/guests/GuestForm';
@@ -14,7 +14,7 @@ import { GuestDirectory } from '../components/guests/GuestDirectory';
 import { useApp } from '../components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { db, appId } from '../lib/firebase';
-import { collection, addDoc, updateDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
 
 import { Suspense } from 'react';
 
@@ -30,7 +30,7 @@ function GreeterContent() {
     const [currentGuestId, setCurrentGuestId] = useState<string | null>(null);
     const [selectedTempId, setSelectedTempId] = useState('');
     const [copied, setCopied] = useState(false);
-    const [blockedDates, setBlockedDates] = useState<{ start: string, end: string }[]>([]);
+    const [blockedDates, setBlockedDates] = useState<CalendarEvent[]>([]);
 
     // Guest Directory State
     const [isGuestbookOpen, setIsGuestbookOpen] = useState(false);
@@ -126,27 +126,71 @@ function GreeterContent() {
         }
     }, [selectedPropId, guestIdParam]);
 
-    // Fetch Calendar Data
+    // Fetch Calendar Data (Internal + External)
     useEffect(() => {
-        if (selectedProperty?.airbnbIcalUrl) {
-            fetch(`/api/calendar?url=${encodeURIComponent(selectedProperty.airbnbIcalUrl)}`)
-                .then(res => {
-                    if (!res.ok) throw new Error("Failed to fetch calendar");
-                    return res.json();
-                })
-                .then(data => {
-                    if (data.events) {
-                        setBlockedDates(data.events);
+        const fetchCalendarData = async () => {
+            if (!user?.uid || !selectedProperty) return;
+
+            let allEvents: CalendarEvent[] = [];
+
+            // 1. Fetch Internal Bookings (Host Pilot)
+            try {
+                const guestsRef = collection(db, `artifacts/${appId}/users/${user.uid}/guests`);
+                const q = query(
+                    guestsRef,
+                    where('propName', '==', selectedProperty.name)
+                );
+
+                const querySnapshot = await getDocs(q);
+                const internalEvents: CalendarEvent[] = [];
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data() as Guest;
+                    // Only block for valid statuses
+                    if (data.status !== 'cancelled' && data.checkInDate && data.checkOutDate) {
+                        internalEvents.push({
+                            start: data.checkInDate,
+                            end: data.checkOutDate,
+                            summary: `Hosted: ${data.guestName}`,
+                            source: 'manual',
+                            color: '#3b82f6' // Host Pilot Blue
+                        });
                     }
-                })
-                .catch(err => {
-                    console.error("Failed to sync calendar", err);
-                    showToast("Calendar sync failed", "error");
                 });
-        } else {
-            setBlockedDates([]);
-        }
-    }, [selectedProperty?.airbnbIcalUrl, showToast]);
+
+                allEvents = [...allEvents, ...internalEvents];
+            } catch (err) {
+                console.error("Error fetching internal bookings:", err);
+            }
+
+            // 2. Fetch External iCal Feeds
+            const feeds = selectedProperty.icalFeeds || [];
+
+            // Fetch all feeds in parallel
+            const feedPromises = feeds.map(async (feed) => {
+                const events = await fetchExternalCalendar(feed.url);
+                return events.map(e => ({
+                    ...e,
+                    source: feed.name,
+                    color: feed.color
+                }));
+            });
+
+            try {
+                const externalResults = await Promise.all(feedPromises);
+                externalResults.forEach(events => {
+                    allEvents = [...allEvents, ...events];
+                });
+            } catch (err) {
+                console.error("Error fetching external calendars", err);
+                showToast("Some calendars failed to sync", "error");
+            }
+
+            setBlockedDates(allEvents);
+        };
+
+        fetchCalendarData();
+    }, [selectedProperty, user?.uid, showToast]);
 
     const selectedTemplate = templates.find(t => t.id === selectedTempId) || templates[0];
 
@@ -270,6 +314,7 @@ function GreeterContent() {
                                 blockedDates={blockedDates}
                                 onSaveGuest={handleSaveGuest}
                                 onOpenDirectory={() => setIsGuestbookOpen(true)}
+                                icalFeeds={selectedProperty?.icalFeeds}
                             />
                         </div>
 

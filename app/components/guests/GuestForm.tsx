@@ -4,9 +4,9 @@ import { GuestDetails, GuestFormProps } from '../../lib/types';
 import { Card } from '../ui/Card';
 import { SectionHeader } from '../ui/SectionHeader';
 import { Input } from '../ui/Input';
-import { DatePicker } from '../ui/DatePicker';
+import { DatePicker } from '../calendar/DatePicker';
 
-export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templateContent = '', blockedDates = [], onSaveGuest, onOpenDirectory }) => {
+export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templateContent = '', blockedDates = [], onSaveGuest, onOpenDirectory, icalFeeds = [] }) => {
 
     const isDateBlocked = (dateStr: string, type: 'checkIn' | 'checkOut') => {
         if (!dateStr || blockedDates.length === 0) return false;
@@ -70,6 +70,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     otherDate={details.checkOutDate}
                                     onChange={(date) => update('checkInDate', date)}
                                     blockedDates={blockedDates}
+                                    icalFeeds={icalFeeds}
                                 />
                             </div>
                             <div className="group bg-black/20 p-3 md:p-4 rounded-2xl border border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
@@ -81,6 +82,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     otherDate={details.checkInDate}
                                     onChange={(date) => update('checkOutDate', date)}
                                     blockedDates={blockedDates}
+                                    icalFeeds={icalFeeds}
                                 />
                             </div>
                         </div>
