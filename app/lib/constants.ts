@@ -44,6 +44,8 @@ export const FEATURE_CARD_STYLES = {
     }
 };
 
+export const GUEST_FILTER_OPTIONS = ['all', 'upcoming', 'past'] as const;
+
 export const VARIABLE_CATEGORIES = {
     "Property Details": ['propertyName', 'wifiName', 'wifiPass', 'locationLink', 'propertyLink', 'checkInTime', 'checkOutTime', 'baseGuests'],
     "Guest & Booking": ['guestName', 'numberOfGuests', 'nights', 'checkInDate', 'checkOutDate'],

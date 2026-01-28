@@ -14,7 +14,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
             onClick={() => onSelect && onSelect(guest)}
             className={`
                 group relative bg-slate-800/40 border border-white/5 rounded-2xl p-4 transition-all hover:bg-slate-800/60 hover:border-white/10
-                ${onSelect ? 'cursor-pointer hover:scale-[1.02] active:scale-95' : ''}
+                ${onSelect ? 'cursor-pointer hover:scale-[1.02] active:scale-95 hover:z-10' : ''}
                 ${mode === 'page' ? 'flex flex-col justify-between min-h-[160px]' : ''}
             `}
         >
@@ -92,10 +92,14 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                     </div>
 
                     {propertyName && (
-                        <div className="flex justify-start">
+                        <div className="flex justify-between items-center">
                             <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-bold tracking-wide uppercase ${styles.bg} ${styles.border} ${styles.text}`}>
                                 <Home size={10} className={styles.icon} />
                                 {propertyName}
+                            </div>
+
+                            <div className="bg-indigo-600 text-white p-2 rounded-xl shadow-lg shadow-indigo-500/20 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform md:translate-x-4 md:group-hover:translate-x-0">
+                                <ArrowRight size={16} />
                             </div>
                         </div>
                     )}

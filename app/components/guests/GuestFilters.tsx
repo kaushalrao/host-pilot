@@ -2,6 +2,7 @@ import React from 'react';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { GuestFiltersProps } from '../../lib/types';
+import { GUEST_FILTER_OPTIONS } from '../../lib/constants';
 
 export const GuestFilters: React.FC<GuestFiltersProps> = ({
     search,
@@ -51,8 +52,8 @@ export const GuestFilters: React.FC<GuestFiltersProps> = ({
                         </button>
                     </div>
 
-                    <div className={`bg-slate-900/50 border border-white/10 rounded-xl p-1 grid grid-cols-2 shrink-0 w-full md:w-auto min-w-[280px]`}>
-                        {(['upcoming', 'past'] as const).map((filter) => (
+                    <div className={`bg-slate-900/50 border border-white/10 rounded-xl p-1 grid grid-cols-3 shrink-0 w-full md:w-auto min-w-[280px]`}>
+                        {GUEST_FILTER_OPTIONS.map((filter) => (
                             <button
                                 key={filter}
                                 onClick={() => setStatusFilter(filter)}
