@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
-import { Home, Edit3, Trash2, Plus, LogOut, Users, CreditCard, Clock, Wifi, MessageCircle, Sparkles, X } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Home, Edit3, Trash2, Plus, LogOut, Users, CreditCard, Clock, Wifi, MessageCircle, Sparkles, X, Copy, Check } from 'lucide-react';
 import { collection, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { Property, Template } from '../lib/types';
 import { DEFAULT_PROPERTY_TIMES, DEFAULT_PROPERTY_VALUES } from '../lib/constants';
@@ -25,6 +25,11 @@ export default function SettingsPage() {
     const [editingTemp, setEditingTemp] = useState<Partial<Template> | null>(null);
     const editorRef = useRef<VariableEditorRef>(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [origin, setOrigin] = useState('');
+
+    useEffect(() => {
+        setOrigin(window.location.origin);
+    }, []);
 
     // Redirect if not logged in (handled by layout/provider ideally, but safe check here)
     React.useEffect(() => {
@@ -239,7 +244,37 @@ export default function SettingsPage() {
                                         <Input name="wifiPass" label="WiFi Password" defaultValue={editingProp.wifiPass} />
                                         <Input name="locationLink" label="Maps Link" defaultValue={editingProp.locationLink} placeholder="https://maps..." />
                                         <Input name="propertyLink" label="Website Link" defaultValue={editingProp.propertyLink} placeholder="https://website..." />
-                                        <Input name="airbnbIcalUrl" label="Airbnb iCal URL" defaultValue={editingProp.airbnbIcalUrl} placeholder="https://www.airbnb.com/calendar/ical/..." />
+                                        <Input name="airbnbIcalUrl" label="Airbnb iCal URL (Import)" defaultValue={editingProp.airbnbIcalUrl} placeholder="https://www.airbnb.com/calendar/ical/..." />
+
+                                        {editingProp.id && (
+                                            <div className="space-y-1">
+                                                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1.5">
+                                                    Export Calendar (2-Way Sync)
+                                                </label>
+                                                <div className="flex gap-2">
+                                                    <div className="relative flex-1">
+                                                        <input
+                                                            type="text"
+                                                            readOnly
+                                                            value={`${origin}/api/public/calendar?uid=${user.uid}&propertyId=${editingProp.id}`}
+                                                            className="w-full bg-slate-900/50 border border-white/10 rounded-xl py-3 pl-4 pr-4 text-sm text-slate-400 focus:outline-none cursor-not-allowed select-all"
+                                                        />
+                                                    </div>
+                                                    <Button
+                                                        type="button"
+                                                        variant="secondary"
+                                                        className="px-4 rounded-xl"
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(`${origin}/api/public/calendar?uid=${user.uid}&propertyId=${editingProp.id}`);
+                                                            showToast("Export URL copied!", "success");
+                                                        }}
+                                                    >
+                                                        <Copy size={18} />
+                                                    </Button>
+                                                </div>
+                                                <p className="text-[10px] text-slate-500 ml-1">Paste this URL into Airbnb&apos;s &quot;Import Calendar&quot; to prevent double bookings.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="flex gap-4 pt-8 mt-4 border-t border-white/5">

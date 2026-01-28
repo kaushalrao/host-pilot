@@ -35,6 +35,31 @@ function GreeterContent() {
     // Guest Directory State
     const [isGuestbookOpen, setIsGuestbookOpen] = useState(false);
 
+    const isGuestLoadingRef = React.useRef(false);
+
+    const handleSelectGuest = React.useCallback((guest: Guest) => {
+        if (guest?.propName) {
+            const prop = properties.find(p => p.name === guest.propName);
+            if (prop && prop.id !== selectedPropId) {
+                isGuestLoadingRef.current = true;
+                setSelectedPropId(prop.id);
+            }
+        }
+
+        setGuestDetails({
+            guestName: guest.guestName,
+            numberOfGuests: guest.numberOfGuests,
+            advancePaid: guest.advancePaid,
+            discount: guest.discount || 0,
+            checkInDate: guest.checkInDate,
+            checkOutDate: guest.checkOutDate,
+            phoneNumber: guest.phoneNumber || ''
+        });
+        setCurrentGuestId(guest.id);
+        setIsGuestbookOpen(false);
+        showToast("Guest details loaded", "success");
+    }, [properties, selectedPropId, showToast]);
+
     // Redirect if not logged in
     useEffect(() => {
         if (!user) {
@@ -68,7 +93,7 @@ function GreeterContent() {
         if (user && guestIdParam && !currentGuestId) {
             loadGuestFromUrl();
         }
-    }, [user, guestIdParam]);
+    }, [user, guestIdParam, currentGuestId, handleSelectGuest, showToast]);
 
     useEffect(() => {
         if (!selectedPropId && properties.length > 0) {
@@ -83,8 +108,6 @@ function GreeterContent() {
     }, [templates, selectedTempId]);
 
     const selectedProperty = properties.find(p => p.id === selectedPropId) || properties[0];
-
-    const isGuestLoadingRef = React.useRef(false);
 
     // Reset dates & guest ID when property changes
     useEffect(() => {
@@ -221,29 +244,6 @@ function GreeterContent() {
             console.error("Error saving guest:", error);
             showToast("Failed to save guest", "error");
         }
-    };
-
-    const handleSelectGuest = (guest: Guest) => {
-        if (guest?.propName) {
-            const prop = properties.find(p => p.name === guest.propName);
-            if (prop && prop.id !== selectedPropId) {
-                isGuestLoadingRef.current = true;
-                setSelectedPropId(prop.id);
-            }
-        }
-
-        setGuestDetails({
-            guestName: guest.guestName,
-            numberOfGuests: guest.numberOfGuests,
-            advancePaid: guest.advancePaid,
-            discount: guest.discount || 0,
-            checkInDate: guest.checkInDate,
-            checkOutDate: guest.checkOutDate,
-            phoneNumber: guest.phoneNumber || ''
-        });
-        setCurrentGuestId(guest.id);
-        setIsGuestbookOpen(false);
-        showToast("Guest details loaded", "success");
     };
 
     return (
