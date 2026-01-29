@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Check, Copy, MessageCircle, PenTool, Eye, X, Loader2 } from 'lucide-react';
 import { GuestDetails, Guest, CalendarEvent } from '../lib/types';
 import { DEFAULT_GUEST_DETAILS } from '../lib/constants';
-import { calculateNights, formatDate, formatCurrency, processTemplate, fetchExternalCalendar } from '../lib/utils';
+import { calculateNights, formatDate, formatCurrency, processTemplate, fetchExternalCalendar, openWhatsApp } from '../lib/utils';
 import { PropertyDock } from '../components/PropertyDock';
 import { Portal } from '../components/ui/Portal';
 import { GuestForm } from '../components/guests/GuestForm';
@@ -242,9 +242,7 @@ function GreeterContent() {
     };
 
     const handleWhatsApp = () => {
-        if (!generatedMessage) return;
-        const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(generatedMessage)}`;
-        window.open(url, '_blank');
+        openWhatsApp(generatedMessage, guestDetails.phoneNumber);
     };
 
     const handleSaveGuest = async () => {

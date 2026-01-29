@@ -77,3 +77,18 @@ export const getPropertyColorKey = (name: string) => {
     }
     return keys[Math.abs(hash) % keys.length];
 };
+
+export const openWhatsApp = (message: string, phoneNumber?: string) => {
+    if (!message) return;
+
+    let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+
+    if (phoneNumber) {
+        const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+        if (cleanPhone) {
+            url += `&phone=${cleanPhone}`;
+        }
+    }
+
+    window.open(url, '_blank');
+};
