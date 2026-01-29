@@ -116,7 +116,8 @@ function GreeterContent() {
             setGuestDetails(prev => ({
                 ...prev,
                 checkInDate: '',
-                checkOutDate: ''
+                checkOutDate: '',
+                numberOfGuests: selectedProperty?.baseGuests || DEFAULT_GUEST_DETAILS.numberOfGuests
             }));
             setCurrentGuestId(null);
         }
@@ -124,7 +125,7 @@ function GreeterContent() {
         if (isGuestLoadingRef.current) {
             isGuestLoadingRef.current = false;
         }
-    }, [selectedPropId, guestIdParam]);
+    }, [selectedPropId, guestIdParam, selectedProperty]);
 
     // Fetch Calendar Data (Internal + External)
     useEffect(() => {
