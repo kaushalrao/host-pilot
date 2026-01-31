@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Check, Copy, MessageCircle, PenTool, Eye, X, Loader2 } from 'lucide-react';
 import { GuestDetails, Guest, CalendarEvent } from '../lib/types';
 import { DEFAULT_GUEST_DETAILS } from '../lib/constants';
-import { calculateNights, formatDate, formatCurrency, processTemplate, fetchExternalCalendar, openWhatsApp } from '../lib/utils';
+import { calculateNights, formatDate, formatCurrency, processTemplate, openWhatsApp } from '../lib/utils';
 import { PropertyDock } from '../components/PropertyDock';
 import { Portal } from '../components/ui/Portal';
 import { GuestForm } from '../components/guests/GuestForm';
@@ -13,8 +13,7 @@ import { PreviewPhone } from '../components/PreviewPhone';
 import { GuestDirectory } from '../components/guests/GuestDirectory';
 import { useApp } from '../components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { db, appId } from '../lib/firebase';
-import { collection, addDoc, updateDoc, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
+import { dataService, calendarService } from '../services';
 
 import { Suspense } from 'react';
 
@@ -73,11 +72,9 @@ function GreeterContent() {
             if (!user || !guestIdParam) return;
 
             try {
-                const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/guests`, guestIdParam);
-                const docSnap = await getDoc(docRef);
+                const guest = await dataService.guests.getOne(user.uid, guestIdParam);
 
-                if (docSnap.exists()) {
-                    const guest = { id: docSnap.id, ...docSnap.data() } as Guest;
+                if (guest) {
                     handleSelectGuest(guest);
                     // Clear param so a refresh doesn't re-fetch if we navigate away inside app?
                     // Or keep it. Let's keep it simple for now.
@@ -136,17 +133,12 @@ function GreeterContent() {
 
             // 1. Fetch Internal Bookings (Host Pilot)
             try {
-                const guestsRef = collection(db, `artifacts/${appId}/users/${user.uid}/guests`);
-                const q = query(
-                    guestsRef,
-                    where('propName', '==', selectedProperty.name)
-                );
-
-                const querySnapshot = await getDocs(q);
+                const guests = await dataService.guests.getAll(user.uid);
                 const internalEvents: CalendarEvent[] = [];
 
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data() as Guest;
+                guests.forEach((data) => {
+                    // Filter by propName manually since getAll returns all
+                    if (data.propName !== selectedProperty.name) return;
                     // Only block for valid statuses
                     if (data.status !== 'cancelled' && data.checkInDate && data.checkOutDate) {
                         internalEvents.push({
@@ -169,7 +161,7 @@ function GreeterContent() {
 
             // Fetch all feeds in parallel
             const feedPromises = feeds.map(async (feed) => {
-                const events = await fetchExternalCalendar(feed.url);
+                const events = await calendarService.fetchExternal(feed.url);
                 return events.map(e => ({
                     ...e,
                     source: feed.name,
@@ -252,6 +244,11 @@ function GreeterContent() {
             return;
         }
 
+        if (!user) {
+            showToast("Please sign in to save", "error");
+            return;
+        }
+
         try {
             // Calculate Total Amount for saving
             const nights = calculateNights(guestDetails.checkInDate, guestDetails.checkOutDate);
@@ -271,16 +268,17 @@ function GreeterContent() {
                 totalAmount: totalAmount
             };
 
-            const path = `artifacts/${appId}/users/${user?.uid}/guests`;
+
 
             if (currentGuestId) {
                 // Update existing
-                await updateDoc(doc(db, path, currentGuestId), guestData);
+                await dataService.guests.update(user.uid, currentGuestId, guestData);
                 showToast("Guest updated!", "success");
             } else {
                 // Create new
-                const docRef = await addDoc(collection(db, path), guestData);
-                setCurrentGuestId(docRef.id);
+                // Cast to any to bypass Partial check here, assuming form validation handles required fields
+                const id = await dataService.guests.add(user.uid, guestData as any);
+                setCurrentGuestId(id);
                 showToast("Guest saved to directory!", "success");
             }
         } catch (error) {

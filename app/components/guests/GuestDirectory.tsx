@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Users } from 'lucide-react';
 import { Guest, GuestDirectoryProps } from '../../lib/types';
 import { format, addMonths, subMonths } from 'date-fns';
-import { app, db, appId } from '../../lib/firebase';
-import { collection, onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
+import { app, appId } from '../../lib/firebase';
+import { dataService } from '../../services';
 import { useApp } from '../providers/AppProvider';
 import { GuestCard } from './GuestCard';
 import { GuestFilters } from './GuestFilters';
@@ -18,11 +18,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
     useEffect(() => {
         if (!user || !app) return;
 
-        const path = `artifacts/${appId}/users/${user.uid}/guests`;
-        const q = query(collection(db, path), orderBy('createdAt', 'desc'));
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const guestList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Guest));
+        const unsubscribe = dataService.guests.subscribe(user.uid, (guestList) => {
             setGuests(guestList);
             setLoading(false);
         }, (error) => {
@@ -38,9 +34,9 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         e.stopPropagation();
         if (!confirm('Are you sure you want to delete this guest?')) return;
 
+        if (!user) return;
         try {
-            const path = `artifacts/${appId}/users/${user?.uid}/guests`;
-            await deleteDoc(doc(db, path, id));
+            await dataService.guests.delete(user.uid, id);
             showToast('Guest deleted', 'success');
         } catch (error) {
             console.error(error);

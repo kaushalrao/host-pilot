@@ -2,8 +2,9 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { collection, query, onSnapshot } from 'firebase/firestore';
-import { auth, db, appId } from '../../lib/firebase';
+
+import { auth } from '../../lib/firebase';
+import { dataService } from '../../services';
 import { Property, Template, ToastState, MaintenanceIssue } from '../../lib/types';
 import { Toast } from '../ui/Toast';
 
@@ -58,23 +59,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             return;
         }
 
-        const qProps = query(collection(db, `artifacts/${appId}/users/${user.uid}/properties`));
-        const unsubProps = onSnapshot(qProps, (snapshot) => {
-            const props = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Property));
+        const unsubProps = dataService.properties.subscribe(user.uid, (props) => {
             setProperties(props);
-        });
+        }, (err) => console.error("Error fetching properties", err));
 
-        const qTemps = query(collection(db, `artifacts/${appId}/users/${user.uid}/templates`));
-        const unsubTemps = onSnapshot(qTemps, (snapshot) => {
-            const temps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Template));
+        const unsubTemps = dataService.templates.subscribe(user.uid, (temps) => {
             setTemplates(temps);
-        });
+        }, (err) => console.error("Error fetching templates", err));
 
-        const qIssues = query(collection(db, `artifacts/${appId}/users/${user.uid}/maintenance`));
-        const unsubIssues = onSnapshot(qIssues, (snapshot) => {
-            const issuesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MaintenanceIssue));
-            setIssues(issuesData);
-        });
+        const unsubIssues = dataService.maintenance.subscribe(user.uid, (issues) => {
+            setIssues(issues);
+        }, (err) => console.error("Error fetching issues", err));
 
         return () => {
             unsubProps();

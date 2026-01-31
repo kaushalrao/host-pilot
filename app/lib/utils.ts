@@ -1,3 +1,4 @@
+import { APP_URLS } from './urls';
 import { COLOR_VARIANTS } from './constants';
 import { Guest } from './types';
 
@@ -43,57 +44,7 @@ export const processTemplate = (templateStr: string, data: Record<string, string
 
 
 
-import { Capacitor, CapacitorHttp } from '@capacitor/core';
-
 // ... (existing imports)
-
-export const parseICal = (text: string): { start: string, end: string, summary: string }[] => {
-    const events: { start: string, end: string, summary: string }[] = [];
-    const eventBlocks = text.split('BEGIN:VEVENT');
-
-    for (const block of eventBlocks) {
-        const dtStartMatch = block.match(/DTSTART(?:;[^:]+)*:(\d{8})/);
-        const dtEndMatch = block.match(/DTEND(?:;[^:]+)*:(\d{8})/);
-        const summaryMatch = block.match(/SUMMARY:(.*)/);
-
-        if (dtStartMatch && dtEndMatch) {
-            const s = dtStartMatch[1];
-            const e = dtEndMatch[1];
-            const formatDate = (d: string) => `${d.substring(0, 4)}-${d.substring(4, 6)}-${d.substring(6, 8)}`;
-
-            events.push({
-                start: formatDate(s),
-                end: formatDate(e),
-                summary: summaryMatch ? summaryMatch[1].trim() : 'Booked'
-            });
-        }
-    }
-    return events;
-};
-
-export const fetchExternalCalendar = async (url: string): Promise<{ start: string, end: string, summary: string }[]> => {
-    try {
-        if (Capacitor.isNativePlatform()) {
-            // Mobile: Use CapacitorHttp to bypass CORS
-            const response = await CapacitorHttp.get({ url });
-            if (response.status === 200) {
-                // response.data works for text too according to docs, but let's be safe
-                const text = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
-                return parseICal(text);
-            }
-        } else {
-            // Web: Use proxy API to avoid CORS
-            const res = await fetch(`/api/calendar?url=${encodeURIComponent(url)}`);
-            if (res.ok) {
-                const data = await res.json();
-                if (data.events) return data.events;
-            }
-        }
-    } catch (error) {
-        console.error("Error fetching calendar:", url, error);
-    }
-    return [];
-};
 
 export const getStatusColor = (status: Guest['status']) => {
     switch (status) {
@@ -118,7 +69,7 @@ export const getPropertyColorKey = (name: string) => {
 export const openWhatsApp = (message: string, phoneNumber?: string) => {
     if (!message) return;
 
-    let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    let url = `${APP_URLS.API.WHATSAPP_SEND}?text=${encodeURIComponent(message)}`;
 
     if (phoneNumber) {
         const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
